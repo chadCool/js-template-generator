@@ -1,0 +1,14 @@
+@min-label-width: 80px; //为了让Search的每一项对齐好看
+.container {
+  .searchForm {
+    :global(.ant-form-item) {
+      display: flex;
+    }
+    :global(.ant-form-item-control-wrapper) {
+      flex: 1;
+    }
+    :global(.ant-col .ant-form-item-label) {
+      min-width: @min-label-width;
+    }
+  }
+}
