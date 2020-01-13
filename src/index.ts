@@ -1,5 +1,7 @@
-import startServer from 'octopus-node';
-import {IntentReceiver} from "octopus-end-nodejs";
+#!/usr/bin/env node
+
+import startServer from '@octopuses/octopus-node';
+import {IntentReceiver} from "@octopuses/octopus-end-nodejs";
 import fs from 'fs';
 import path from 'path'
 

@@ -1,14 +1,16 @@
 {
-  "name": "@octoplus/js-template-generator",
-  "version": "0.0.1",
+  "name": "@octopuses/js-template-generator",
+  "version": "0.0.4",
   "description": "",
-  "main": "./lib/index.js",
   "scripts": {
     "startServer": "node ./lib/index",
-    "build": "tsc -w",
+    "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
   },
+  "files": [
+    "/lib"
+  ],
   "bin": {
     "js-template-generator": "./lib/index.js"
   },
@@ -19,6 +21,8 @@
   "author": "Chad",
   "license": "ISC",
   "dependencies": {
+    "@octopuses/octopus-end-nodejs": "0.1.1",
+    "@octopuses/octopus-node": "^0.1.0",
     "art-template": "^4.13.2"
   },
   "devDependencies": {
