@@ -16,8 +16,7 @@ template.defaults.imports.contains = function (list: any[], item: any) {
 // require.extensions['.ts'] = template.extension;
 
 //TODO: 允许设置模板代码的位置
-function updateTableCode(session, dataKey, data, targetDir, options) {
-    const templatePath = "./tpl/table";
+function updateTableCode(templatePath, session, dataKey, data, targetDir, options) {
     console.log("sessionData old", session, JSON.stringify(loadSession(session)));
     updateSession(session, dataKey, data);
     const sessionData = loadSession(session);
@@ -134,10 +133,14 @@ export default function start() {
             console.log("data", JSON.stringify(message));
             // 通过代码模板生成代码到指定的目录
             // C:\work\helper\antd-template\src
-            const { session, template, dataKey, data, targetDir, options } = message;
+            const { session, template, dataKey, data, targetDir, options, templatePath } = message;
+            if (templatePath === undefined) {
+                console.error("templdatePath is empty");
+                return;
+            }
             switch (template) {
                 case "table@chad":
-                    updateTableCode(session, dataKey, data, targetDir, options);
+                    updateTableCode(path.join(templatePath, 'table'), session, dataKey, data, targetDir, options);
                     break;
             }
         }
