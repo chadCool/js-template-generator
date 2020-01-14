@@ -1,6 +1,6 @@
 {
   "name": "@octopuses/js-template-generator",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "scripts": {
     "startServer": "node ./lib/server",
