@@ -1,7 +1,5 @@
-#!/usr/bin/env node
-
 import startServer from '@octopuses/octopus-node';
-import {IntentReceiver} from "@octopuses/octopus-end-nodejs";
+import { IntentReceiver } from "@octopuses/octopus-end-nodejs";
 import fs from 'fs';
 import path from 'path'
 
@@ -10,50 +8,26 @@ template.defaults.rules[0].test = /<%(#?)((?:==|=#|[=-])?)[ \t]*([\w\W]*?)[ \t]*
 template.defaults.rules[1].test = /\$\$([@#]?)[ \t]*(\/?)([\w\W]*?)[ \t]*\$\$/; // /{{([@#]?)[ \t]*(\/?)([\w\W]*?)[ \t]*}}/;
 template.defaults.cache = false; // TODO 方便调试模板本身后期关闭
 
-template.defaults.imports.contains = function(list:any[], item:any){
+template.defaults.imports.contains = function (list: any[], item: any) {
     return list.find(item) !== undefined
 };
 
 // require.extensions['.tsx'] = template.extension;
 // require.extensions['.ts'] = template.extension;
 
-console.log('[start server]');
-startServer();
-
-console.log('[register intent receiver1]');
-
-const ct = new IntentReceiver("codeTemplate");
-// TODO: 如果有多个内容更新过来， 应该分开管理
-//TODO 利用ws的path
-setTimeout(() => {
-        ct.registerIntentReceiver([{action: "data/xxx"}], (_, messageRaw) => {
-                const message = JSON.parse(messageRaw);
-                console.log("data", JSON.stringify(message));
-                // 通过代码模板生成代码到指定的目录
-                // C:\work\helper\antd-template\src
-                const {session, template, dataKey, data, targetDir, options} = message;
-                switch (template) {
-                    case "table@chad":
-                        updateTableCode(session, dataKey, data, targetDir, options);
-                        break;
-                }
-            }
-        )
-    }, 1000
-);
 //TODO: 允许设置模板代码的位置
 function updateTableCode(session, dataKey, data, targetDir, options) {
-    const templatePath = "C:\\work\\helper\\antd-template\\tpl\\table";
+    const templatePath = "./tpl/table";
     console.log("sessionData old", session, JSON.stringify(loadSession(session)));
     updateSession(session, dataKey, data);
     const sessionData = loadSession(session);
     console.log("sessionData merged:", JSON.stringify(sessionData));
 
     // 获取目标目录下面的所有的模板文件， 按照规则替换成相应的文件
-    fs.stat(templatePath, function(error, stats) {
+    fs.stat(templatePath, function (error, stats) {
         if (error) {
             console.error("读取文件属性失败", error);
-            return ;
+            return;
         }
         if (stats.isDirectory()) {
             updateCodeDirFromTemplatePlusData(templatePath, sessionData, targetDir);
@@ -75,20 +49,20 @@ function updateTableCode(session, dataKey, data, targetDir, options) {
 }
 
 function updateCodeDirFromTemplatePlusData(templateDir, data, targetDir) {
-    fs.readdir(templateDir, function(err, files){
+    fs.readdir(templateDir, function (err, files) {
         if (err) {
             console.error(`walk ${templateDir} fail`, err);
             return;
         }
-        files.forEach(f=>{
+        files.forEach(f => {
             // 只关注.art 文件
             if (f.endsWith(".art")) {
                 fs.stat(path.join(templateDir, f), function (e, s) {
                     if (e) {
                         console.error("读取文件属性失败", e);
-                        return ;
+                        return;
                     }
-                    if(s.isFile()){
+                    if (s.isFile()) {
                         updateCodeFileFromTemplatePlusData(path.join(templateDir, f), data, path.join(targetDir, f.substr(0, f.length - 4)));
                     } else {
                         // TODO 是否递归的获取所有的子目录
@@ -102,14 +76,14 @@ function updateCodeDirFromTemplatePlusData(templateDir, data, targetDir) {
 function updateCodeFileFromTemplatePlusData(templateFilePath, data, targetFilePath) {
     try {
         const view = require(templateFilePath);
-        fs.writeFile(targetFilePath, view(data), error=>{
-            if(error){
+        fs.writeFile(targetFilePath, view(data), error => {
+            if (error) {
                 console.error(`writeFile fail ${templateFilePath} ${targetFilePath}`, error);
                 return;
             }
             // console.log("write file done");
         })
-    }catch (e) {
+    } catch (e) {
         console.error("updateCodeFileFromTemplatePlusData", e)
     }
 }
@@ -132,7 +106,7 @@ function updateSession(session, dataKey, data) {
     const sessionData = allData[session] || {};
     const keys = dataKey.split('.');
     let d = sessionData || {};
-    for (let i = 0; i < keys.length; i+= 1){
+    for (let i = 0; i < keys.length; i += 1) {
         const key = keys[i];
         if (i === keys.length - 1) {
             d[key] = data;
@@ -144,7 +118,30 @@ function updateSession(session, dataKey, data) {
     allData[session] = sessionData;
 }
 
+export default function start() {
 
+    console.log('[start server]');
+    startServer();
 
+    console.log('[register intent receiver1]');
 
-
+    const ct = new IntentReceiver("codeTemplate");
+    // TODO: 如果有多个内容更新过来， 应该分开管理
+    //TODO 利用ws的path
+    setTimeout(() => {
+        ct.registerIntentReceiver([{ action: "data/xxx" }], (_, messageRaw) => {
+            const message = JSON.parse(messageRaw);
+            console.log("data", JSON.stringify(message));
+            // 通过代码模板生成代码到指定的目录
+            // C:\work\helper\antd-template\src
+            const { session, template, dataKey, data, targetDir, options } = message;
+            switch (template) {
+                case "table@chad":
+                    updateTableCode(session, dataKey, data, targetDir, options);
+                    break;
+            }
+        }
+        )
+    }, 1000
+    );
+}
