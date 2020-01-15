@@ -13,7 +13,7 @@
   ],
   "main": "./lib/index.js",
   "bin": {
-    "js-template-generator": "./lib/startServer.js"
+    "js-template-generator": "./lib/server.js"
   },
   "keywords": [
     "octopus",
